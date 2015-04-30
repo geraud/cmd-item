@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TypeFamilies      #-}
@@ -45,12 +46,14 @@ instance Monoid CmdItem where
     mappend (CmdItem cmdA localA) (CmdItem cmdB localB) =
         CmdItem (cmdA <> cmdB) (localA <> localB)
 
-instance IsString (CmdItem) where
+instance IsString CmdItem where
     fromString "" = mempty
     fromString st = CmdItem [pack st] mempty
 
-instance IsList (CmdItem) where
+#if MIN_VERSION_base(4,7,0)
+instance IsList CmdItem where
     type Item CmdItem = (Text, Text)
     fromList [] = mempty
     fromList lst = CmdItem mempty (M.fromList lst)
     toList (CmdItem _ m) = M.toList m
+#endif
